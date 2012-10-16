@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+tar="/usr/bin/gnutar"
+format="v7"
+
+if [ -z "$1" ]; then
+    echo "Usage: $(basename $0) file" 1>&2
+    exit 1
+fi
+
+if [ ! -e "$1" ]; then
+    echo "$(basename $0): '$1' is not found." 1>&2
+    exit 1
+fi
+
+dir="$(dirname "$1")"
+src="$(basename "$1")"
+dst="$src.tgz"
+echo "Creating '$dst'"
+
+# リソースフォークの無視
+#   10.4以前 COPY_EXTENDED_ATTRIBUTES_DISABLE
+#   10.5以降 COPYFILE_DISABLE
+COPY_EXTENDED_ATTRIBUTES_DISABLE=1 \
+COPYFILE_DISABLE=1 \
+$tar -cvz --format=$format \
+     --exclude=.DS_Store \
+     -f "$dir/$dst" -C "$dir" "$src"
